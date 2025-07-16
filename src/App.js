@@ -1,31 +1,35 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
-import "./App.css";
 
 function App() {
+  const [itemName, setItemName] = useState("");
   const [items, setItems] = useState([]);
-  const [newItem, setNewItem] = useState("");
 
+  // ✅ Fetch items on page load
   useEffect(() => {
     fetch("https://fullstack-todo-list-app-4.onrender.com/items")
       .then((res) => res.json())
       .then((data) => setItems(data));
   }, []);
 
+  // ✅ Add item
   const addItem = () => {
-    if (newItem.trim() === "") return;
+    if (itemName.trim() === "") return;
+
     fetch("https://fullstack-todo-list-app-4.onrender.com/items", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: newItem }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: itemName }),
     })
       .then((res) => res.json())
       .then((data) => {
         setItems([...items, data]);
-        setNewItem("");
+        setItemName(""); // clear input
       });
   };
 
+  // ✅ Delete item
   const deleteItem = (index) => {
     fetch(`https://fullstack-todo-list-app-4.onrender.com/items/${index}`, {
       method: "DELETE",
@@ -37,30 +41,21 @@ function App() {
   };
 
   return (
-    <div className="App">
+    <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h1>📝 Fullstack Todo App</h1>
       <input
         type="text"
+        value={itemName}
         placeholder="Enter item"
-        value={newItem}
-        onChange={(e) => setNewItem(e.target.value)}
+        onChange={(e) => setItemName(e.target.value)}
       />
       <button onClick={addItem}>Add</button>
 
-      <ul>
+      <ul style={{ listStyleType: "none", padding: 0 }}>
         {items.map((item, index) => (
-          <li key={index}>
-            {item.name}
-            <button
-              onClick={() => deleteItem(index)}
-              style={{
-                marginLeft: "10px",
-                backgroundColor: "red",
-                color: "white",
-              }}
-            >
-              Delete
-            </button>
+          <li key={index} style={{ marginTop: "10px" }}>
+            {item.name}{" "}
+            <button onClick={() => deleteItem(index)}>Delete</button>
           </li>
         ))}
       </ul>
