@@ -1,34 +1,31 @@
-import React, { useState, useEffect } from 'react';
-import './App.css';
+// src/App.js
+import React, { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
-  const [itemName, setItemName] = useState('');
   const [items, setItems] = useState([]);
+  const [newItem, setNewItem] = useState("");
 
-  // ✅ Fetch items from backend
   useEffect(() => {
     fetch("https://fullstack-todo-list-app-4.onrender.com/items")
-      .then(res => res.json())
-      .then(data => setItems(data));
+      .then((res) => res.json())
+      .then((data) => setItems(data));
   }, []);
 
-  // ✅ Add item
   const addItem = () => {
-    if (itemName.trim() === "") return;
-
+    if (newItem.trim() === "") return;
     fetch("https://fullstack-todo-list-app-4.onrender.com/items", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: itemName })
+      body: JSON.stringify({ name: newItem }),
     })
-      .then(res => res.json())
-      .then(data => {
+      .then((res) => res.json())
+      .then((data) => {
         setItems([...items, data]);
-        setItemName('');
+        setNewItem("");
       });
   };
 
-  // ✅ Delete item
   const deleteItem = (index) => {
     fetch(`https://fullstack-todo-list-app-4.onrender.com/items/${index}`, {
       method: "DELETE",
@@ -42,21 +39,28 @@ function App() {
   return (
     <div className="App">
       <h1>📝 Fullstack Todo App</h1>
-      <div className="input-area">
-        <input
-          type="text"
-          placeholder="Enter item"
-          value={itemName}
-          onChange={(e) => setItemName(e.target.value)}
-        />
-        <button onClick={addItem}>Add</button>
-      </div>
+      <input
+        type="text"
+        placeholder="Enter item"
+        value={newItem}
+        onChange={(e) => setNewItem(e.target.value)}
+      />
+      <button onClick={addItem}>Add</button>
 
       <ul>
         {items.map((item, index) => (
           <li key={index}>
             {item.name}
-            <button className="delete-btn" onClick={() => deleteItem(index)}>❌ Delete</button>
+            <button
+              onClick={() => deleteItem(index)}
+              style={{
+                marginLeft: "10px",
+                backgroundColor: "red",
+                color: "white",
+              }}
+            >
+              Delete
+            </button>
           </li>
         ))}
       </ul>
