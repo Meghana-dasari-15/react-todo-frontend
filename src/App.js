@@ -1,53 +1,49 @@
+// src/App.js
+
 import React, { useState } from "react";
 import "./App.css";
 
 function App() {
-  const [item, setItem] = useState("");
+  const [input, setInput] = useState("");
   const [items, setItems] = useState([]);
 
   const handleAdd = () => {
-    if (item.trim() === "") return;
-
-    // ✅ Add new item to local state (not backend)
-    setItems([...items, item]);
-    setItem("");
-
-    // Optional: Play sound
-    new Audio("/add.mp3").play();
+    if (input.trim() === "") return;
+    setItems([...items, input]);
+    setInput("");
   };
 
   const handleDelete = (index) => {
-    const updatedItems = [...items];
-    updatedItems.splice(index, 1);
-    setItems(updatedItems);
-
-    // Optional: Play sound
-    new Audio("/delete.mp3").play();
+    const updated = [...items];
+    updated.splice(index, 1);
+    setItems(updated);
   };
 
   return (
     <div className="app-container">
       <h1>📝 Fullstack Todo App</h1>
-      <input
-        type="text"
-        placeholder="Enter item"
-        value={item}
-        onChange={(e) => setItem(e.target.value)}
-      />
-      <button onClick={handleAdd}>Add</button>
-
-      <ul>
-        {items.map((itm, idx) => (
-          <li key={idx}>
-            {itm}
-            <button onClick={() => handleDelete(idx)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <div className="input-container">
+        <input
+          type="text"
+          placeholder="Enter item"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+        />
+        <button onClick={handleAdd}>Add</button>
+      </div>
+      {items.map((item, index) => (
+        <div className="todo-item" key={index}>
+          <span className="todo-text">{item}</span>
+          <button className="delete-btn" onClick={() => handleDelete(index)}>
+            Delete
+          </button>
+        </div>
+      ))}
     </div>
   );
 }
 
 export default App;
+
 
 
