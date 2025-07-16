@@ -21,7 +21,7 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>📝 Fullstack Todo App</h1>
+      <h1>📝 Fullstack To-do App</h1>
       <div className="input-container">
         <input
           type="text"
