@@ -1,33 +1,35 @@
-import { useEffect, useState } from "react";
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
   const [items, setItems] = useState([]);
-  const [input, setInput] = useState("");
+  const [newItem, setNewItem] = useState("");
 
-  // Fetch items from backend on load
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/items")
+    fetch("https://fullstack-todo-list-app-4.onrender.com/items")
       .then((res) => res.json())
       .then((data) => setItems(data));
   }, []);
 
-  // Add item to backend
   const addItem = () => {
-    if (!input.trim()) return; // avoid empty input
-    fetch("http://127.0.0.1:8000/items", {
+    if (!newItem.trim()) return;
+
+    fetch("https://fullstack-todo-list-app-4.onrender.com/items", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: input }),
-    }).then(() => {
-      setItems([...items, { name: input }]);
-      setInput("");
-    });
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: newItem }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setItems([...items, data]);
+        setNewItem("");
+      });
   };
 
-  // Delete item from backend
   const deleteItem = (index) => {
-    fetch(`http://127.0.0.1:8000/items/${index}`, {
+    fetch(`https://fullstack-todo-list-app-4.onrender.com/items/${index}`, {
       method: "DELETE",
     }).then(() => {
       const updatedItems = [...items];
@@ -37,12 +39,12 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <h1>📝 Fullstack Todo App</h1>
+    <div>
+      <h1>Todo List</h1>
       <input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Enter item"
+        value={newItem}
+        onChange={(e) => setNewItem(e.target.value)}
+        placeholder="Add a new item"
       />
       <button onClick={addItem}>Add</button>
       <ul>
@@ -51,7 +53,11 @@ function App() {
             {item.name}
             <button
               onClick={() => deleteItem(index)}
-              style={{ marginLeft: '10px', backgroundColor: 'red', color: 'white', border: 'none', borderRadius: '4px', padding: '5px 10px' }}
+              style={{
+                marginLeft: "10px",
+                backgroundColor: "red",
+                color: "white",
+              }}
             >
               Delete
             </button>
@@ -63,4 +69,3 @@ function App() {
 }
 
 export default App;
-
