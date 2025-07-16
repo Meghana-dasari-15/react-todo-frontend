@@ -1,40 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 function App() {
   const [itemText, setItemText] = useState("");
   const [items, setItems] = useState([]);
 
-  // ✅ Load items on page load
-  useEffect(() => {
-    fetch("https://fullstack-todo-list-app-4.onrender.com/items")
-      .then((res) => res.json())
-      .then((data) => setItems(data));
-  }, []);
-
-  // ✅ Add new item
+  // ✅ Add new item (only in current session)
   const handleAdd = () => {
     if (itemText.trim() === "") return;
-    fetch("https://fullstack-todo-list-app-4.onrender.com/items", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: itemText }),
-    })
-      .then((res) => res.json())
-      .then((newItem) => {
-        setItems([...items, newItem]);
-        setItemText("");
-      });
+
+    // Add directly to frontend, skip backend
+    setItems([...items, { name: itemText }]);
+    setItemText("");
   };
 
-  // ✅ Delete item
   const handleDelete = (index) => {
-    fetch(`https://fullstack-todo-list-app-4.onrender.com/items/${index}`, {
-      method: "DELETE",
-    }).then(() => {
-      const updatedItems = [...items];
-      updatedItems.splice(index, 1);
-      setItems(updatedItems);
-    });
+    const updatedItems = [...items];
+    updatedItems.splice(index, 1);
+    setItems(updatedItems);
   };
 
   return (
@@ -66,6 +48,8 @@ function App() {
 }
 
 export default App;
+
+
 
 
 
