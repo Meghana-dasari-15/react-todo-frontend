@@ -1,55 +1,71 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
-  const [itemText, setItemText] = useState("");
   const [items, setItems] = useState([]);
+  const [newItem, setNewItem] = useState("");
 
-  // ✅ Add new item (only in current session)
+  const API_URL = "https://fullstack-todo-list-app-4.onrender.com/items";
+
+  // Fetch all items from backend
+  useEffect(() => {
+    fetch(API_URL)
+      .then((res) => res.json())
+      .then((data) => setItems(data))
+      .catch((err) => console.error("Error fetching items:", err));
+  }, []);
+
+  // Add new item
   const handleAdd = () => {
-    if (itemText.trim() === "") return;
-
-    // Add directly to frontend, skip backend
-    setItems([...items, { name: itemText }]);
-    setItemText("");
+    if (!newItem.trim()) return;
+    fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newItem }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setItems([...items, data]);
+        setNewItem("");
+      });
   };
 
+  // Delete item by index
   const handleDelete = (index) => {
-    const updatedItems = [...items];
-    updatedItems.splice(index, 1);
-    setItems(updatedItems);
+    fetch(`${API_URL}/${index}`, {
+      method: "DELETE",
+    })
+      .then((res) => res.json())
+      .then(() => {
+        const updatedItems = [...items];
+        updatedItems.splice(index, 1);
+        setItems(updatedItems);
+      });
   };
 
   return (
-    <div style={{ padding: 20, fontFamily: "Arial", textAlign: "center" }}>
+    <div className="app-container">
       <h1>📝 Fullstack Todo App</h1>
-      <input
-        value={itemText}
-        onChange={(e) => setItemText(e.target.value)}
-        placeholder="Enter item"
-        style={{ padding: "8px", width: "60%" }}
-      />
-      <button
-        onClick={handleAdd}
-        style={{ padding: "8px 16px", marginLeft: 10 }}
-      >
-        Add
-      </button>
 
-      <ul style={{ listStyleType: "none", padding: 0, marginTop: 20 }}>
-        {items.map((item, index) => (
-          <li key={index} style={{ marginBottom: 10 }}>
-            <span style={{ marginRight: 10 }}>{item.name}</span>
-            <button onClick={() => handleDelete(index)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      <input
+        type="text"
+        placeholder="Enter item"
+        value={newItem}
+        onChange={(e) => setNewItem(e.target.value)}
+      />
+      <button onClick={handleAdd}>Add</button>
+
+      {items.map((item, index) => (
+        <div key={index} className="todo-item">
+          <span className="todo-text">{item.name}</span>
+          <button onClick={() => handleDelete(index)}>Delete</button>
+        </div>
+      ))}
     </div>
   );
 }
 
 export default App;
-
-
 
 
 
