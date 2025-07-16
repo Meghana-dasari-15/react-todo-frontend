@@ -1,59 +1,60 @@
 import React, { useState, useEffect } from "react";
+import "./App.css";
 
 function App() {
-  const [itemName, setItemName] = useState("");
   const [items, setItems] = useState([]);
+  const [newItem, setNewItem] = useState("");
 
-  // ✅ Fetch items on page load
+  const API_URL = "https://fullstack-todo-list-app-4.onrender.com/items";
+
+  // Load items from backend
   useEffect(() => {
-    fetch("https://fullstack-todo-list-app-4.onrender.com/items")
+    fetch(API_URL)
       .then((res) => res.json())
-      .then((data) => setItems(data));
+      .then((data) => setItems(data))
+      .catch((err) => console.error("Error fetching items:", err));
   }, []);
 
-  // ✅ Add item
+  // Add new item
   const addItem = () => {
-    if (itemName.trim() === "") return;
+    if (newItem.trim() === "") return;
 
-    fetch("https://fullstack-todo-list-app-4.onrender.com/items", {
+    fetch(API_URL, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: itemName }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: newItem }),
     })
       .then((res) => res.json())
       .then((data) => {
         setItems([...items, data]);
-        setItemName(""); // clear input
+        setNewItem("");
       });
   };
 
-  // ✅ Delete item
+  // Delete item by index
   const deleteItem = (index) => {
-    fetch(`https://fullstack-todo-list-app-4.onrender.com/items/${index}`, {
-      method: "DELETE",
-    }).then(() => {
-      const updatedItems = [...items];
-      updatedItems.splice(index, 1);
-      setItems(updatedItems);
-    });
+    fetch(`${API_URL}/${index}`, { method: "DELETE" })
+      .then(() => {
+        const updated = [...items];
+        updated.splice(index, 1);
+        setItems(updated);
+      });
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
+    <div className="App">
       <h1>📝 Fullstack Todo App</h1>
       <input
         type="text"
-        value={itemName}
+        value={newItem}
+        onChange={(e) => setNewItem(e.target.value)}
         placeholder="Enter item"
-        onChange={(e) => setItemName(e.target.value)}
       />
       <button onClick={addItem}>Add</button>
 
-      <ul style={{ listStyleType: "none", padding: 0 }}>
+      <ul>
         {items.map((item, index) => (
-          <li key={index} style={{ marginTop: "10px" }}>
+          <li key={index}>
             {item.name}{" "}
             <button onClick={() => deleteItem(index)}>Delete</button>
           </li>
@@ -64,3 +65,4 @@ function App() {
 }
 
 export default App;
+
