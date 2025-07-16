@@ -1,64 +1,62 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
+import React, { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
+  const [itemName, setItemName] = useState('');
   const [items, setItems] = useState([]);
-  const [newItem, setNewItem] = useState("");
 
+  // ✅ Fetch items from backend
   useEffect(() => {
     fetch("https://fullstack-todo-list-app-4.onrender.com/items")
-      .then((res) => res.json())
-      .then((data) => setItems(data))
-      .catch((err) => console.error("Error fetching items:", err));
+      .then(res => res.json())
+      .then(data => setItems(data));
   }, []);
 
+  // ✅ Add item
   const addItem = () => {
-    if (!newItem.trim()) return;
+    if (itemName.trim() === "") return;
 
     fetch("https://fullstack-todo-list-app-4.onrender.com/items", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: newItem }), // ✅ Must match backend model
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: itemName })
     })
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
         setItems([...items, data]);
-        setNewItem("");
-      })
-      .catch((err) => console.error("Error adding item:", err));
+        setItemName('');
+      });
   };
 
+  // ✅ Delete item
   const deleteItem = (index) => {
     fetch(`https://fullstack-todo-list-app-4.onrender.com/items/${index}`, {
       method: "DELETE",
-    })
-      .then(() => {
-        const updatedItems = [...items];
-        updatedItems.splice(index, 1);
-        setItems(updatedItems);
-      })
-      .catch((err) => console.error("Error deleting item:", err));
+    }).then(() => {
+      const updatedItems = [...items];
+      updatedItems.splice(index, 1);
+      setItems(updatedItems);
+    });
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Todo List</h1>
-      <input
-        value={newItem}
-        onChange={(e) => setNewItem(e.target.value)}
-        placeholder="Add new item"
-      />
-      <button onClick={addItem}>Add</button>
+    <div className="App">
+      <h1>📝 Fullstack Todo App</h1>
+      <div className="input-area">
+        <input
+          type="text"
+          placeholder="Enter item"
+          value={itemName}
+          onChange={(e) => setItemName(e.target.value)}
+        />
+        <button onClick={addItem}>Add</button>
+      </div>
 
       <ul>
         {items.map((item, index) => (
           <li key={index}>
             {item.name}
-            <button onClick={() => deleteItem(index)} style={{ marginLeft: "10px" }}>
-              Delete
-            </button>
+            <button className="delete-btn" onClick={() => deleteItem(index)}>❌ Delete</button>
           </li>
         ))}
       </ul>
