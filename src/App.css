@@ -84,3 +84,9 @@ button:hover {
 .delete-btn:hover {
   background-color: #e60000;
 }
+ 
+button {
+  margin: 0 5px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
